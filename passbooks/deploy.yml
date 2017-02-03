@@ -107,7 +107,7 @@
            - /omd/DEPLOYED/Packages/setup-packages/4-graphviz/*
         file: dest=/omd/DEPLOYED/Packages/setup-packages/2-omd-pre
         find:
-	    patterns: "*.rpm"
+           patterns: "*.rpm"
 	    
         command: rpm -Uvh {{item}}
         with_fileglob:
