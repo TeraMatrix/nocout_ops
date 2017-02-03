@@ -78,62 +78,62 @@
 # start deployment of rpm packacges for centos system for centos
       - name: start installing the packages on machine
         file: dest=/omd/DEPLOYED/Packages/machine-packages/0-0-0-pm
-	command: rpm -Uvh {{item}}
-	with_fileglob:
+        command: rpm -Uvh {{item}}
+        with_fileglob:
 	   - /omd/DEPLOYED/Packages/machine-packages/0-0-0-pm/*
         file: dest=/omd/DEPLOYED/Packages/machine-packages/0-0-pre-machine
-	command: rpm -Uvh {{item}}
-	with_fileglob:
+        command: rpm -Uvh {{item}}
+        with_fileglob:
 	   - /omd/DEPLOYED/Packages/machine-packages/0-0-pre-machine/*
         file: dest=/omd/DEPLOYED/Packages/machine-packages/0-1-pre-machine
-	command: rpm -Uvh {{item}}
-	with_fileglob:
+        command: rpm -Uvh {{item}}
+        with_fileglob:
 	   - /omd/DEPLOYED/Packages/machine-packages/0-1-pre-machine/*
         file: dest=/omd/DEPLOYED/Packages/machine-packages/0-2-pre-machine
-	command: rpm -Uvh {{item}}
-	with_fileglob:
+        command: rpm -Uvh {{item}}
+        with_fileglob:
 	   - /omd/DEPLOYED/Packages/machine-packages/0-2-pre-machine/*
         file: dest=/omd/DEPLOYED/Packages/setup-packages/1-python-post/device_app_pckgs
-	command: easy_install {{item}}
-	with_fileglob:
+        command: easy_install {{item}}
+        with_fileglob:
 	   - /omd/DEPLOYED/Packages/setup-packages/1-python-post/device_app_pckgs/*
         file: dest=/omd/DEPLOYED/Packages/setup-packages/4-graphviz-pre
-	command: rpm -Uvh {{item}}
-	with_fileglob:
+        command: rpm -Uvh {{item}}
+        with_fileglob:
 	   - /omd/DEPLOYED/Packages/setup-packages/4-graphviz-pre/*
         file: dest=/omd/DEPLOYED/Packages/setup-packages/4-graphviz
-	command: rpm -Uvh {{item}}
-	with_fileglob:
+        command: rpm -Uvh {{item}}
+        with_fileglob:
 	   - /omd/DEPLOYED/Packages/setup-packages/4-graphviz/*
         file: dest=/omd/DEPLOYED/Packages/setup-packages/2-omd-pre
-	find:
+        find:
 	    patterns: "*.rpm"
 	    
-	command: rpm -Uvh {{item}}
-	with_fileglob:
+        command: rpm -Uvh {{item}}
+        with_fileglob:
 	   - /omd/DEPLOYED/Packages/setup-packages/2-omd-pre/*
         file: dest=/omd/DEPLOYED/Packages/setup-packages/3-omd
-	copy: src={{item}} dest=/omd owner=root mode=600
-	with_fileglob:
+        copy: src={{item}} dest=/omd owner=root mode=600
+        with_fileglob:
 	   - /omd/DEPLOYED/Packages/setup-packages/3-omd/*
       - name: extract the omd release
-        command: tar xvzf {{omd_release}}
+        command: tar xvzf {{omd_release}} 
         args:
             chdir: /omd
       - name: install omd
-	command: ./configure
-	args:
-	    chdir: /omd
+        command: ./configure
+        args:
+            chdir: /omd
       - name: Run commands for installtion-1
         command: make
-	args:
-	    chdir: /omd
+        args:
+            chdir: /omd
       - name: Run commands for installation-2
-	command: make pack
-	args:
-	    chdir: /omd
+        command: make pack
+        args:
+            chdir: /omd
       - name: Run commands for installation-3
-	command: make setup
-	args:
-	   chdir: /omd
+        command: make setup
+        args:
+            chdir: /omd
 #TODO install memcache and celery and python memcache	
