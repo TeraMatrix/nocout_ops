@@ -1,0 +1,82 @@
+- hosts: localhost
+  vars_files:
+    - secret 
+  tasks:
+    - name: install easy_python
+      easy_install:
+        name: pip
+        state: latest
+    - name: install zlib1g-dev
+      sudo: yes
+      apt:
+          name: zlib1g-dev
+          state: latest
+      apt:
+          name: libssl-dev
+          state: latest
+
+    - name: install virtualenv
+      pip:
+       name: virtualenv
+
+    - name: Create local python for installing virtualenv
+      become_user: nitin 
+      file:
+          state: directory
+          path: /home/nitin/Documents/localpython
+          mode: 0755
+
+    - name: download the python module
+      command: wget https://www.python.org/ftp/python/2.7.8/Python-2.7.8.tar.xz
+      args:
+          chdir: /home/nitin/Documents/localpython
+
+    - name: extract the python2.7
+      command: tar xvpf Python-2.7.8.tar.xz 
+      args:
+          chdir: /home/nitin/Documents/localpython
+
+    - name: Download virtualenv
+      command: wget https://pypi.python.org/packages/d4/0c/9840c08189e030873387a73b90ada981885010dd9aea134d6de30cd24cb8/virtualenv-15.1.0.tar.gz#md5=44e19f4134906fe2d75124427dc9b716
+      args:
+          chdir: /home/nitin/Documents/localpython
+    
+    - name: extract the vnv
+      command: tar -zxvf virtualenv-15.1.0.tar.gz
+      args:
+          chdir: /home/nitin/Documents/localpython
+
+    - name: execute permissions on file
+      become_user: nitin
+      file:
+          path: /home/nitin/Documents/localpython/Python-2.7.8/configure
+          mode: u=rwX,g=rX,o=rX
+
+    - name: configure python
+      command: /bin/sh configure --with-zlib --prefix=/home/nitin/Documents/localpython
+      args:
+          chdir: /home/nitin/Documents/localpython/Python-2.7.8
+  
+    - name: install python
+      command: make
+      command: make install
+      args:
+          chdir: /home/nitin/Documents/localpython/Python-2.7.8
+    
+
+    - name: install vnv with new python
+      command: /home/nitin/Documents/localpython/bin/python setup.py install
+      args:
+          chdir: /home/nitin/Documents/localpython/virtualenv-15.1.0
+
+    - name: create virtual env with new python
+      command: /home/nitin/Documents/localpython/bin/virtualenv nout --python=/home/nitin/Documents/localpython/bin/python2.7
+      args:
+          chdir: /home/nitin/Documents/NOCOUT/nocout_gis
+
+    - name: Install requirements
+      pip:
+          requirements: /home/nitin/Documents/NOCOUT/nocout_gis/requirements.txt 
+          virtualenv: /home/nitin/Documents/NOCOUT/nocout_gis/nout
+          virtualenv_python: /home/nitin/Documents/localpython/bin/python2.7
+

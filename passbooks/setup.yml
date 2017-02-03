@@ -1,0 +1,16 @@
+- hosts: localhost
+  tasks:
+    - name: create set up directories on system
+      become_user: nitin
+      file:
+          state: directory
+          path: /home/nitin/Documents/NOCOUT
+          mode: 0755
+
+    - name: git clone
+      become_user: nitin
+      git:
+        repo: https://{{githubuser| urlencode}}:{{ githubpassword }}@github.com/nitin-tm/nocout_gis.git
+        dest: /home/nitin/Documents/NOCOUT/nocout_gis
+        clone: yes
+

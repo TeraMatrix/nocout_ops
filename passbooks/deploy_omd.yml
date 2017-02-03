@@ -1,0 +1,171 @@
+- hosts: 172.16.5.133
+  vars_files:
+   - my_local_secret
+  vars:
+      src: /DEPLOYED/Packages/machine-packages/0-0-0-pm
+  tasks: 
+# start deployment of rpm packacges for centos system for centos
+      - name: install packages-0
+        command: cat /omd/DEPLOYED/Packages/machine-packages/0-0-0-pm/readme
+        register: pm_files
+
+      - name: start deploying packages
+        sudo: yes
+      #- file: dest=/omd/DEPLOYED/Packages/machine-packages/0-0-0-pm state=directory
+        command: rpm -Uvh --force /omd/DEPLOYED/Packages/machine-packages/0-0-0-pm/{{item}}
+        with_items:
+            - "{{pm_files.stdout_lines}}"	
+      - name: install packages -1
+        command: cat /omd/DEPLOYED/Packages/machine-packages/0-0-pre-machine/readme
+        register: 0_pm_files
+
+      - name: start deploying packages
+        sudo: yes
+      #- file: dest=/omd/DEPLOYED/Packages/machine-packages/0-0-0-pm state=directory
+        command: rpm -Uvh --force /omd/DEPLOYED/Packages/machine-packages/0-0-pre-machine/{{item}}
+        with_items:
+            - "{{0_pm_files.stdout_lines}}"
+	
+      - name: install packages -2
+        command: cat /omd/DEPLOYED/Packages/machine-packages/0-1-pre-machine/readme
+        register: 1_pm_files
+
+      - name: start deploying packages
+        sudo: yes
+      #- file: dest=/omd/DEPLOYED/Packages/machine-packages/0-0-0-pm state=directory
+        command: rpm -Uvh --force /omd/DEPLOYED/Packages/machine-packages/0-1-pre-machine/{{item}}
+        with_items:
+            - "{{1_pm_files.stdout_lines}}"
+	
+      - name: install packages -3
+        command: cat /omd/DEPLOYED/Packages/machine-packages/0-2-pre-machine/readme
+        register: 2_pm_files
+
+      - name: start deploying packages
+        sudo: yes
+      #- file: dest=/omd/DEPLOYED/Packages/machine-packages/0-0-0-pm state=directory
+        command: rpm -Uvh --force /omd/DEPLOYED/Packages/machine-packages/0-2-pre-machine/{{item}}
+        with_items:
+            - "{{2_pm_files.stdout_lines}}"	
+      - name: install packages -4
+        command: cat /omd/DEPLOYED/Packages/machine-packages/4-graphviz/readme
+        register: 4_gp_files
+
+      - name: start deploying packages
+        sudo: yes
+      #- file: dest=/omd/DEPLOYED/Packages/machine-packages/0-0-0-pm state=directory
+        command: rpm -Uvh --force /omd/DEPLOYED/Packages/machine-packages/4-graphviz/{{item}}
+        with_items:
+            - "{{4_gp_files.stdout_lines}}"	
+      - name: install packages -5
+        command: cat /omd/DEPLOYED/Packages/machine-packages/4-graphviz-pre/readme
+        register: 4_gp_pre_files
+
+      - name: start deploying packages
+        sudo: yes
+      #- file: dest=/omd/DEPLOYED/Packages/machine-packages/0-0-0-pm state=directory
+        command: rpm -Uvh --force /omd/DEPLOYED/Packages/machine-packages/4-graphviz-pre/{{item}}
+        with_items:
+            - "{{4_gp_pre_files.stdout_lines}}"	
+      - name: install packages -6
+        command: cat /omd/DEPLOYED/Packages/machine-packages/5-PHP/readme
+        register: 5_php_files
+
+      - name: start deploying packages
+        sudo: yes
+      #- file: dest=/omd/DEPLOYED/Packages/machine-packages/0-0-0-pm state=directory
+        command: rpm -Uvh --force /omd/DEPLOYED/Packages/machine-packages/5-PHP/{{item}}
+        with_items:
+            - "{{5_php_files.stdout_lines}}"	
+      - name: install omd
+        command: tar xvzf /omd/DEPLOYED/Packages/machine-packages/3-omd/omd-1.10-src.tar.gz
+        args:
+	    chdir: /omd/DEPLOYED/Packages/machine-packages/3-omd
+      - name: install omd -1
+        #TODO: Replace version-name with actual version
+        sudo: yes
+        command: make
+        register: out_make
+        failed_when: "'error' not in out_make.stdout"
+        args:
+	    chdir: /omd/DEPLOYED/Packages/machine-packages/3-omd/omd-6.5
+   
+      - name: install omd -2
+        #TODO: Replace version-name with actual version
+        sudo: yes
+        command: sudo make pack
+        register: out_pack
+        failed_when: "'error' not in out_pack.stdout"
+        args:
+	    chdir: /omd/DEPLOYED/Packages/machine-packages/3-omd/omd-6.5
+ 
+      - name: install omd -3
+        #TODO: Replace version-name with actual version
+        sudo: yes
+        command: sudo make setup
+        register: out_setup 
+        failed_when: "'error' not in out_setup.stdout"
+        args:
+	    chdir: /omd/DEPLOYED/Packages/machine-packages/3-omd/omd-6.5
+
+        #args:
+        #args:
+        #args:
+        #    chdir: /omd/DEPLOYED/Packages/machine-packages/0-0-0-pm
+        #with_fileglob:
+        #    - "{{src}}/*"
+
+#     file: dest=/omd/DEPLOYED/Packages/machine-packages/0-0-pre-machine
+#     command: rpm -Uvh {{item}}
+#     with_fileglob:
+#        - /omd/DEPLOYED/Packages/machine-packages/0-0-pre-machine/*
+#     file: dest=/omd/DEPLOYED/Packages/machine-packages/0-1-pre-machine
+#     command: rpm -Uvh {{item}}
+#     with_fileglob:
+#        - /omd/DEPLOYED/Packages/machine-packages/0-1-pre-machine/*
+#     file: dest=/omd/DEPLOYED/Packages/machine-packages/0-2-pre-machine
+#     command: rpm -Uvh {{item}}
+#     with_fileglob:
+#        - /omd/DEPLOYED/Packages/machine-packages/0-2-pre-machine/*
+#     file: dest=/omd/DEPLOYED/Packages/setup-packages/1-python-post/device_app_pckgs
+#     command: easy_install {{item}}
+#     with_fileglob:
+#        - /omd/DEPLOYED/Packages/setup-packages/1-python-post/device_app_pckgs/*
+#     file: dest=/omd/DEPLOYED/Packages/setup-packages/4-graphviz-pre
+#     command: rpm -Uvh {{item}}
+#     with_fileglob:
+#        - /omd/DEPLOYED/Packages/setup-packages/4-graphviz-pre/*
+#     file: dest=/omd/DEPLOYED/Packages/setup-packages/4-graphviz
+#     command: rpm -Uvh {{item}}
+#     with_fileglob:
+#        - /omd/DEPLOYED/Packages/setup-packages/4-graphviz/*
+#     file: dest=/omd/DEPLOYED/Packages/setup-packages/2-omd-pre
+#     find:
+#        patterns: "*.rpm"
+#     command: rpm -Uvh {{item}}
+#     with_fileglob:
+#        - /omd/DEPLOYED/Packages/setup-packages/2-omd-pre/*
+#     file: dest=/omd/DEPLOYED/Packages/setup-packages/3-omd
+#     copy: src={{ item }} dest=/omd owner=root mode=600
+#     with_fileglob:
+#        - /omd/DEPLOYED/Packages/setup-packages/3-omd/*
+#   - name: extract the omd release
+#     command: tar xvzf {{omd_release}}
+#     args:
+#        chdir: /omd
+#   - name: install omd
+#     command: ./configure
+#     args:
+#        chdir: /omd
+#   - name: Run commands for installtion-1
+#     command: make
+#     args:
+#        chdir: /omd
+#   - name: Run commands for installation-2
+#     command: make pack
+#     args:
+#        chdir: /omd
+#   - name: Run commands for installation-3
+#     command: make setup
+#     args:
+#        chdir: /omd

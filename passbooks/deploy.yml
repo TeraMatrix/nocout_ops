@@ -1,0 +1,139 @@
+- hosts: localhost
+  vars_files:
+    - secret
+  vars:
+      release_folder: /omd/nocout/nocout_gis-v-S12-UAT-04-01-17-0.tar.gz
+      release_name: nocout_gis-v-S12-UAT-04-01-17-0
+      depoly_settings_folder: /omd/nocout/DeploySettings
+      omd_release_folder: omd-1.10-src-base-omd.tgz
+  tasks:
+      - name: extract the release
+        command: tar xvzf {{release_folder}}
+        args:
+            chdir: /omd/nocout
+      - name: check the file exists
+        stat:
+            path: /omd/nocout/nocout
+        register: stat_result
+
+      - name: delete soft link
+        command: rm nocout
+        args:
+          chdir: /omd/nocout
+        when: stat_result.stat.exists == True
+
+      - name: make new link
+        command: ln -s {{release_name}} nocout
+        args:
+            chdir: /omd/nocout
+      - name: copy deploy settings
+        copy:
+             src: "{{depoly_settings_folder}}"
+             dest: /omd/nocout/nocout/nocout/nocout
+        args:
+            chdir: /omd/nocout
+      # Activate virtual enviornment 
+#      - name: activate vnv
+#        command: nocout
+#        args:
+#            chdir: /omd/nocout/nocout/nocout
+      - name: update static files:
+        command: python manage.py collectstatic -c --noinput
+
+      - name: reload uwsgi
+        sudo: yes
+        command: service uwsgi reload
+        args:
+           chdir: /omd/nocout
+      - name: reload nginx
+        sudo: yes
+        command: service nginx reload
+        args:
+            chdir: /omd/nocout	
+      - name: stop celery
+        sudo: yes
+        command: service nocout-celery stop
+        args:
+            chdir: /omd/nocout	
+      - name: stop celery-beat
+        sudo: yes
+        command: service nocout-celerybeat stop
+        args:
+            chdir: /omd/nocout	
+      - name: kill celery process
+        command: ps -ef | grep "celery worker" | awk '{print $2}' | xargs kill -9
+        args:
+            chdir: /omd/nocout	
+      - name: start celery
+        sudo: yes
+        command: service nocout-celery start
+        args:
+            chdir: /omd/nocout	
+      - name: start celerybeat
+        sudo: yes
+        command: service nocout-celerybeat start
+        args:
+            chdir: /omd/nocout	
+
+# start deployment of rpm packacges for centos system for centos
+      - name: start installing the packages on machine
+        file: dest=/omd/DEPLOYED/Packages/machine-packages/0-0-0-pm
+	command: rpm -Uvh {{item}}
+	with_fileglob:
+	   - /omd/DEPLOYED/Packages/machine-packages/0-0-0-pm/*
+        file: dest=/omd/DEPLOYED/Packages/machine-packages/0-0-pre-machine
+	command: rpm -Uvh {{item}}
+	with_fileglob:
+	   - /omd/DEPLOYED/Packages/machine-packages/0-0-pre-machine/*
+        file: dest=/omd/DEPLOYED/Packages/machine-packages/0-1-pre-machine
+	command: rpm -Uvh {{item}}
+	with_fileglob:
+	   - /omd/DEPLOYED/Packages/machine-packages/0-1-pre-machine/*
+        file: dest=/omd/DEPLOYED/Packages/machine-packages/0-2-pre-machine
+	command: rpm -Uvh {{item}}
+	with_fileglob:
+	   - /omd/DEPLOYED/Packages/machine-packages/0-2-pre-machine/*
+        file: dest=/omd/DEPLOYED/Packages/setup-packages/1-python-post/device_app_pckgs
+	command: easy_install {{item}}
+	with_fileglob:
+	   - /omd/DEPLOYED/Packages/setup-packages/1-python-post/device_app_pckgs/*
+        file: dest=/omd/DEPLOYED/Packages/setup-packages/4-graphviz-pre
+	command: rpm -Uvh {{item}}
+	with_fileglob:
+	   - /omd/DEPLOYED/Packages/setup-packages/4-graphviz-pre/*
+        file: dest=/omd/DEPLOYED/Packages/setup-packages/4-graphviz
+	command: rpm -Uvh {{item}}
+	with_fileglob:
+	   - /omd/DEPLOYED/Packages/setup-packages/4-graphviz/*
+        file: dest=/omd/DEPLOYED/Packages/setup-packages/2-omd-pre
+	find:
+	    patterns: "*.rpm"
+	    
+	command: rpm -Uvh {{item}}
+	with_fileglob:
+	   - /omd/DEPLOYED/Packages/setup-packages/2-omd-pre/*
+        file: dest=/omd/DEPLOYED/Packages/setup-packages/3-omd
+	copy: src={{item}} dest=/omd owner=root mode=600
+	with_fileglob:
+	   - /omd/DEPLOYED/Packages/setup-packages/3-omd/*
+      - name: extract the omd release
+        command: tar xvzf {{omd_release}}
+        args:
+            chdir: /omd
+      - name: install omd
+	command: ./configure
+	args:
+	    chdir: /omd
+      - name: Run commands for installtion-1
+        command: make
+	args:
+	    chdir: /omd
+      - name: Run commands for installation-2
+	command: make pack
+	args:
+	    chdir: /omd
+      - name: Run commands for installation-3
+	command: make setup
+	args:
+	   chdir: /omd
+#TODO install memcache and celery and python memcache	

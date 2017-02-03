@@ -1,0 +1,77 @@
+#handle redis
+- hosts: localhost
+  vars_files:
+    - secret 
+  tasks:
+     - name: redis server status
+       become: true
+       shell:  ps -ef | grep redis
+       register: out_redis
+       failed_when: "'/usr/bin/redis-server' not in out_redis.stdout"
+       ignore_errors: true
+
+     - name: Restart the redis service if redis is failed
+       #TODO actual implementation contains the manual starting the service ,change with sudo
+       shell: sudo service redis-server start
+       when: out_redis.failed == true
+
+     - name: memcache server status
+       become: true
+       shell:  ps -ef | grep memcache
+       register: out_memcache
+       failed_when: "'/usr/bin/memcached' not in out_memcache.stdout"
+       ignore_errors: true
+
+     - name: Restart the memcache service if memcache is failed
+       #TODO actual implementation contains the manual starting the service ,change with sudo
+       shell: sudo service memcached start
+       when: out_memcache.failed == true
+
+     - name: nginx server status
+       become: true
+       shell:  sudo service nginx status
+       register: out_nginx
+       failed_when: "'not running' in out_nginx.stdout"
+       ignore_errors: true
+
+     - name: Restart the nginx service if nginx is failed
+       #TODO actual implementation contains the manual starting the service ,change with sudo
+       shell: sudo service nginx start
+       when: out_nginx.failed == true
+
+
+     - name: uwsgi server status
+       become: true
+       shell:  sudo service uwsgi status
+       register: out_uwsgi
+       failed_when: "'not running' in out_uwsgi.stdout"
+       ignore_errors: true
+
+     - name: Restart the uwsgi service if uwsgi is failed
+       #TODO actual implementation contains the manual starting the service ,change with sudo
+       shell: sudo service uwsgi start
+       when: out_uwsgi.failed == true
+
+     - name: celery status
+       become: true
+       shell:  sudo service nocout-celery status
+       register: out_celery
+       failed_when: "'not running' in out_uwsgi.stdout"
+       ignore_errors: true
+
+     - name: Restart the celery service if celery is failed
+       #TODO actual implementation contains the manual starting the service ,change with sudo
+       shell: sudo service nocout-celery start
+       when: out_celery.failed == true
+
+     - name: celery-beat status
+       become: true
+       shell:  sudo service nocout-celerybeat status
+       register: out_beat
+       failed_when: "'not running' in out_uwsgi.stdout"
+       ignore_errors: true
+
+     - name: Restart the beat service if celerybeat is failed
+       #TODO actual implementation contains the manual starting the service ,change with sudo
+       shell: sudo service nocout-celerybeat start
+       when: out_uwsgi.failed == true
