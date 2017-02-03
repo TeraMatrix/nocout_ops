@@ -80,42 +80,42 @@
         file: dest=/omd/DEPLOYED/Packages/machine-packages/0-0-0-pm
         command: rpm -Uvh {{item}}
         with_fileglob:
-	   - /omd/DEPLOYED/Packages/machine-packages/0-0-0-pm/*
+           - /omd/DEPLOYED/Packages/machine-packages/0-0-0-pm/*
         file: dest=/omd/DEPLOYED/Packages/machine-packages/0-0-pre-machine
         command: rpm -Uvh {{item}}
         with_fileglob:
-	   - /omd/DEPLOYED/Packages/machine-packages/0-0-pre-machine/*
+           - /omd/DEPLOYED/Packages/machine-packages/0-0-pre-machine/*
         file: dest=/omd/DEPLOYED/Packages/machine-packages/0-1-pre-machine
         command: rpm -Uvh {{item}}
         with_fileglob:
-	   - /omd/DEPLOYED/Packages/machine-packages/0-1-pre-machine/*
+           - /omd/DEPLOYED/Packages/machine-packages/0-1-pre-machine/*
         file: dest=/omd/DEPLOYED/Packages/machine-packages/0-2-pre-machine
         command: rpm -Uvh {{item}}
         with_fileglob:
-	   - /omd/DEPLOYED/Packages/machine-packages/0-2-pre-machine/*
+           - /omd/DEPLOYED/Packages/machine-packages/0-2-pre-machine/*
         file: dest=/omd/DEPLOYED/Packages/setup-packages/1-python-post/device_app_pckgs
         command: easy_install {{item}}
         with_fileglob:
-	   - /omd/DEPLOYED/Packages/setup-packages/1-python-post/device_app_pckgs/*
+           - /omd/DEPLOYED/Packages/setup-packages/1-python-post/device_app_pckgs/*
         file: dest=/omd/DEPLOYED/Packages/setup-packages/4-graphviz-pre
         command: rpm -Uvh {{item}}
         with_fileglob:
-	   - /omd/DEPLOYED/Packages/setup-packages/4-graphviz-pre/*
+           - /omd/DEPLOYED/Packages/setup-packages/4-graphviz-pre/*
         file: dest=/omd/DEPLOYED/Packages/setup-packages/4-graphviz
         command: rpm -Uvh {{item}}
         with_fileglob:
-	   - /omd/DEPLOYED/Packages/setup-packages/4-graphviz/*
+           - /omd/DEPLOYED/Packages/setup-packages/4-graphviz/*
         file: dest=/omd/DEPLOYED/Packages/setup-packages/2-omd-pre
         find:
 	    patterns: "*.rpm"
 	    
         command: rpm -Uvh {{item}}
         with_fileglob:
-	   - /omd/DEPLOYED/Packages/setup-packages/2-omd-pre/*
+           - /omd/DEPLOYED/Packages/setup-packages/2-omd-pre/*
         file: dest=/omd/DEPLOYED/Packages/setup-packages/3-omd
         copy: src={{item}} dest=/omd owner=root mode=600
         with_fileglob:
-	   - /omd/DEPLOYED/Packages/setup-packages/3-omd/*
+           - /omd/DEPLOYED/Packages/setup-packages/3-omd/*
       - name: extract the omd release
         command: tar xvzf {{omd_release}} 
         args:
